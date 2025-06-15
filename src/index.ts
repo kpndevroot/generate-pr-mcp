@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
+import { URI } from "vscode-uri";
 import {
   CallToolRequestSchema,
   ErrorCode,
@@ -10,9 +10,121 @@ import {
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { writeFile } from "fs/promises";
+import { processDiffForPreview } from "./helpers/index.js";
+import {
+  generatePRMarkdown,
+  generateFallbackPRMarkdown,
+} from "./templates/pr-template.js";
 
 // Promisify exec for better async handling
 const exec = promisify(execCallback);
+
+// Helper function to load and populate the PR template
+async function generatePRFromTemplate(
+  title: string,
+  description: string,
+  diff: string,
+  screenshots?: { before?: string; after?: string } // Optional screenshots
+): Promise<string> {
+  try {
+    // Generate markdown content using the modular template
+    const { changesSummary, mainLogicChanges } = processDiffForPreview(diff);
+
+    return generatePRMarkdown(
+      title,
+      description,
+      changesSummary,
+      mainLogicChanges,
+      diff,
+      screenshots
+    );
+  } catch (error) {
+    // Fallback to simple template if processing fails
+    return generateFallbackPRMarkdown(title, description, diff);
+  }
+}
+
+// Helper function to generate key implementation points
+function generateKeyPoints(diff: string): string {
+  const points = [];
+
+  // Check for core functionality changes
+  if (
+    diff.includes("function") ||
+    diff.includes("class") ||
+    diff.includes("interface")
+  ) {
+    points.push("- [x] Core functionality changes");
+  } else {
+    points.push("- [ ] Core functionality changes");
+  }
+
+  // Check for API modifications
+  if (
+    diff.includes("api") ||
+    diff.includes("endpoint") ||
+    diff.includes("route")
+  ) {
+    points.push("- [x] API modifications");
+  } else {
+    points.push("- [ ] API modifications");
+  }
+
+  // Check for database schema updates
+  if (
+    diff.includes("schema") ||
+    diff.includes("model") ||
+    diff.includes("migration")
+  ) {
+    points.push("- [x] Database schema updates");
+  } else {
+    points.push("- [ ] Database schema updates");
+  }
+
+  // Check for configuration changes
+  if (
+    diff.includes("config") ||
+    diff.includes(".env") ||
+    diff.includes("settings")
+  ) {
+    points.push("- [x] Configuration changes");
+  } else {
+    points.push("- [ ] Configuration changes");
+  }
+
+  // Check for third-party integrations
+  if (
+    diff.includes("import") ||
+    diff.includes("require") ||
+    diff.includes("dependency")
+  ) {
+    points.push("- [x] Third-party integrations");
+  } else {
+    points.push("- [ ] Third-party integrations");
+  }
+
+  return points.join("\n");
+}
+
+// Helper function to generate a simple logic summary for fallback
+function generateSimpleLogicSummary(diff: string): string {
+  const lines = diff.split("\n");
+  const logicChanges = lines
+    .filter(
+      (line) =>
+        line.startsWith("+") &&
+        (line.includes("function") ||
+          line.includes("class") ||
+          line.includes("interface") ||
+          line.includes("export") ||
+          line.includes("import"))
+    )
+    .map((line) => line.substring(1).trim())
+    .slice(0, 5)
+    .join("\n");
+
+  return logicChanges || "Basic functionality changes detected";
+}
 
 const server = new Server(
   {
@@ -63,8 +175,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "string",
               description: "The project directory",
             },
+            rootUri: {
+              type: "string",
+              description: "The root URI of the project",
+            },
           },
-          required: ["title", "description", "projectDirectory"],
+          required: ["title", "description", "projectDirectory", "rootUri"],
           additionalProperties: false,
         },
       },
@@ -74,23 +190,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (request.params.name === "generate_pr") {
-    const { title, description, projectDirectory } = request.params
+    const { title, description, projectDirectory, rootUri } = request.params
       .arguments as {
       title: string;
       description: string;
       projectDirectory: string;
+      rootUri: string;
     };
 
     try {
-      // the project directory
-      // const projectDirectory = "/Users/kpndevroot/Downloads/hobbie/MCP/test-cr";
-      // const cwd = process.cwd();
-
-      // Check if the directory is a git repository
-      const cwd = process.cwd();
+      // get the project directory from the rootUri
+      if (!rootUri) {
+        throw new McpError(ErrorCode.InternalError, "No root URI found");
+      }
+      const projectDirectory = URI.parse(rootUri).fsPath;
       process.chdir(projectDirectory);
+
       try {
-        // get inside the project directory
+        // check if the project directory is a git repository
         await exec("git rev-parse --is-inside-work-tree", {
           cwd: projectDirectory,
         });
@@ -99,7 +216,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: "text",
-              text: `Error: Not a git repository.check and try again. current directory: ${projectDirectory} and cwd: ${cwd}`,
+              text: `Error: Not a git repository.check and try again. current directory: ${projectDirectory}`,
             },
           ],
         };
@@ -176,16 +293,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           );
         }
 
+        // Optional: You can add logic here to detect and include screenshots
+        const screenshots = {
+          // before: "path/to/before/screenshot.png", // Optional
+          // after: "path/to/after/screenshot.png",   // Optional
+        };
+
         // Create PRD content for local changes
-        const prdTemplate = `# ${title}
-
-${description}
-
-## Changes (Local modifications)
-\`\`\`diff
-${diff}
-\`\`\`
-`;
+        const prdTemplate = await generatePRFromTemplate(
+          title,
+          description,
+          diff,
+          screenshots
+        );
 
         // Write to file using fs/promises
         await writeFile(`${projectDirectory}/prd.md`, prdTemplate, "utf8");
@@ -216,19 +336,29 @@ ${diff}
           );
         }
 
-        // Create PRD content
-        const prdTemplate = `# ${title}
+        // Optional: You can add logic here to detect and include screenshots
+        const screenshots = {
+          // before: "path/to/before/screenshot.png", // Optional
+          // after: "path/to/after/screenshot.png",   // Optional
+        };
 
-${description}
+        // implement better naming convention for the PRD file
+        const prdFileName = `${title.toLowerCase().replace(/ /g, "_")}.md`;
 
-## Changes (${currentBranch} vs ${mainBranch})
-\`\`\`diff
-${diff}
-\`\`\`
-`;
+        // Generate PR content with optional screenshots
+        const prdContent = await generatePRFromTemplate(
+          title,
+          description,
+          diff,
+          screenshots
+        );
 
         // Write to file using fs/promises
-        await writeFile(`${projectDirectory}/prd.md`, prdTemplate, "utf8");
+        await writeFile(
+          `${projectDirectory}/${prdFileName}`,
+          prdContent,
+          "utf8"
+        );
 
         return {
           content: [
@@ -238,7 +368,7 @@ ${diff}
             },
             {
               type: "text",
-              text: prdTemplate,
+              text: prdContent,
             },
           ],
         };

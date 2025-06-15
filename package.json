@@ -1,8 +1,7 @@
 {
   "name": "generate-pr-mcp",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "A Model Context Protocol server for generating PRs",
-  "private": true,
   "type": "module",
   "bin": {
     "mcp-server": "./build/index.js"
@@ -18,10 +17,23 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
+    "vscode-uri": "^3.1.0",
     "zod": "^3.25.63"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
     "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "mcp",
+    "pr",
+    "pull-request",
+    "generator"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kpndevroot/generate-pr-mcp.git"
   }
 }

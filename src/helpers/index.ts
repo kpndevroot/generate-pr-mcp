@@ -1,22 +1,56 @@
 import processDiffForPreview from "./processDiffForPreview.js";
-import interpretJavaScriptChanges from "./interpretJavaScriptChanges.js";
-import interpretJsonChanges from "./interpretJsonChanges.js";
-import interpretMarkdownChanges from "./interpretMarkdownChanges.js";
-import interpretGenericChanges from "./interpretGenericChanges.js";
-import countCodeBlocks from "./countCodeBlocks.js";
-import interpretFileChanges from "./interpretFileChanges.js";
-import getLanguageFromExtension from "./getLanguageFromExtension.js";
 import { generateKeyPoints, generateSimpleLogicSummary } from "./prUtils.js";
+import { validatePRParams } from "./validation.js";
+import { generatePRFromTemplate } from "./prGeneration.js";
+import {
+  validateGitRepository,
+  getCurrentBranch,
+  findMainBranch,
+} from "./gitOperations.js";
+import StageDisplayManager, {
+  createStageDisplay,
+  generateStatusMessage,
+  type StageInfo,
+  type StageDisplayOptions,
+} from "./stageDisplay.js";
+import {
+  detectProjectType,
+  generateAIAnalysisPrompt,
+  parseAIAnalysisResponse,
+  cleanDiffForAI,
+  analyzeCodeChangesWithAI,
+  type ProjectMetadata,
+  type AIAnalysisResult,
+} from "./aiAnalysis.js";
+
+// Cursor AI integration
+export {
+  analyzeWithCursorAI,
+  detectProjectTypeWithContext,
+  generateCursorOptimizedPrompt,
+  requestCursorAIAnalysis,
+  type MCPSamplingRequest,
+} from "./cursorAI.js";
 
 export {
   processDiffForPreview,
-  interpretJavaScriptChanges,
-  interpretJsonChanges,
-  interpretMarkdownChanges,
-  interpretGenericChanges,
-  countCodeBlocks,
-  interpretFileChanges,
-  getLanguageFromExtension,
   generateKeyPoints,
   generateSimpleLogicSummary,
+  validatePRParams,
+  generatePRFromTemplate,
+  validateGitRepository,
+  getCurrentBranch,
+  findMainBranch,
+  StageDisplayManager,
+  createStageDisplay,
+  generateStatusMessage,
+  type StageInfo,
+  type StageDisplayOptions,
+  detectProjectType,
+  generateAIAnalysisPrompt,
+  parseAIAnalysisResponse,
+  cleanDiffForAI,
+  analyzeCodeChangesWithAI,
+  type ProjectMetadata,
+  type AIAnalysisResult,
 };

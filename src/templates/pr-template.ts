@@ -22,11 +22,54 @@ export function generatePRMarkdown(
   diff: string,
   screenshots?: { before?: string; after?: string }
 ): string {
-  return `# ${title}
+  try {
+    // Input validation with fallbacks
+    const safeTitle =
+      typeof title === "string" && title.trim() ? title : "Untitled PR";
+    const safeDescription =
+      typeof description === "string" && description.trim()
+        ? description
+        : "No description provided";
+    const safeChangesSummary =
+      typeof changesSummary === "string" && changesSummary.trim()
+        ? changesSummary
+        : "No changes detected";
+    const safeMainLogicChanges =
+      typeof mainLogicChanges === "string" && mainLogicChanges.trim()
+        ? mainLogicChanges
+        : "No logic changes detected";
+    const safeDiff = typeof diff === "string" ? diff : "";
+
+    // Generate key points with error handling
+    let keyPoints: string;
+    try {
+      keyPoints = generateKeyPoints(safeDiff);
+    } catch (error) {
+      console.warn("Error generating key points, using fallback:", error);
+      keyPoints = `- [ ] Core functionality changes
+- [ ] API modifications
+- [ ] Database schema updates
+- [ ] Configuration changes
+- [ ] Third-party integrations`;
+    }
+
+    // Handle screenshots safely
+    const hasScreenshots =
+      screenshots && (screenshots.before || screenshots.after);
+    const beforeScreenshot =
+      screenshots?.before && typeof screenshots.before === "string"
+        ? screenshots.before
+        : "";
+    const afterScreenshot =
+      screenshots?.after && typeof screenshots.after === "string"
+        ? screenshots.after
+        : "";
+
+    return `# ${safeTitle}
 
 ## 🎯 Overview
 
-${description}
+${safeDescription}
 
 ## 📋 Type of Change
 
@@ -42,7 +85,7 @@ ${description}
 ## 🔍 Changes Description
 
 ### What Changed:
-${changesSummary}
+${safeChangesSummary}
 
 ### Why It Changed:
 <!-- Please provide the motivation and context for the changes -->
@@ -50,14 +93,14 @@ ${changesSummary}
 ### Implementation Details:
 
 <!-- This section provides a concise analysis of the key business logic changes -->
-${mainLogicChanges}
+${safeMainLogicChanges}
 
 <!-- The analysis above focuses on explaining the purpose and impact of changes rather than showing raw code -->
 <!-- Sensitive information like API keys, tokens, and environment variables are automatically excluded -->
 <!-- UI component changes include explanations of layout and functionality modifications -->
 
 **Key Implementation Points:**
-${generateKeyPoints(diff)}
+${keyPoints}
 
 ## 🧪 Testing Done
 
@@ -73,22 +116,22 @@ ${generateKeyPoints(diff)}
 ## 📸 Visual Changes
 
 ${
-  screenshots?.before || screenshots?.after
+  hasScreenshots
     ? `
 ### Before:
 ${
-  screenshots?.before
+  beforeScreenshot
     ? `
-![Before Changes](${screenshots.before})
+![Before Changes](${beforeScreenshot})
 `
     : "_No before screenshot provided_"
 }
 
 ### After:
 ${
-  screenshots?.after
+  afterScreenshot
     ? `
-![After Changes](${screenshots.after})
+![After Changes](${afterScreenshot})
 `
     : "_No after screenshot provided_"
 }
@@ -130,6 +173,11 @@ ${
 
 <!-- Optional: Add a fun GIF that represents your PR! -->
 `;
+  } catch (error) {
+    console.error("Error generating PR markdown:", error);
+    // Return a basic fallback template
+    return generateFallbackPRMarkdown(title, description, diff);
+  }
 }
 
 /**
@@ -145,16 +193,69 @@ export function generateFallbackPRMarkdown(
   description: string,
   diff: string
 ): string {
-  return `# ${title}
+  try {
+    // Input validation with fallbacks
+    const safeTitle =
+      typeof title === "string" && title.trim() ? title : "Untitled PR";
+    const safeDescription =
+      typeof description === "string" && description.trim()
+        ? description
+        : "No description provided";
+    const safeDiff = typeof diff === "string" ? diff : "";
+
+    // Generate simple logic summary with error handling
+    let logicSummary: string;
+    try {
+      logicSummary = generateSimpleLogicSummary(safeDiff);
+    } catch (error) {
+      console.warn(
+        "Error generating simple logic summary, using fallback:",
+        error
+      );
+      logicSummary = "Basic functionality changes detected";
+    }
+
+    return `# ${safeTitle}
 
 ## 🎯 Overview
-${description}
+${safeDescription}
 
 ## 🔄 Changes Preview
 ### Implementation Details:
-${generateSimpleLogicSummary(diff)}
+${logicSummary}
 
 **Key Implementation Points:**
 - Core functionality changes detected
+
+## ✅ Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Tests are passing
+
+## 📝 Additional Notes
+This PR was generated using the fallback template due to processing constraints.
 `;
+  } catch (error) {
+    console.error("Error generating fallback PR markdown:", error);
+    // Final fallback - minimal template
+    const finalTitle = title || "Untitled PR";
+    const finalDescription = description || "No description provided";
+
+    return `# ${finalTitle}
+
+## 🎯 Overview
+${finalDescription}
+
+## 🔄 Changes Preview
+Basic changes detected in the repository.
+
+## ✅ Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Tests are passing
+
+## 📝 Additional Notes
+This is a minimal PR template generated as a fallback.
+`;
+  }
 }

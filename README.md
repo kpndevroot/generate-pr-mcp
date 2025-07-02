@@ -17,12 +17,32 @@ A Model Context Protocol server that automatically generates detailed Pull Reque
 
 ## ✨ Features
 
+### Core Features
+
 - 🔍 Analyzes git diffs to create comprehensive PR descriptions
 - 📊 Highlights key implementation points and code changes
 - 🧩 Modular template architecture for customized PR generation
 - 🔎 Automatic project type detection
 - 📝 Generates markdown files for easy sharing
 - 🖼️ Support for including before/after screenshots
+
+### 🤖 NEW: AI-Powered Analysis
+
+#### 🎯 **Cursor AI Integration** (Recommended)
+
+- ✅ **Zero Configuration** - No API keys required!
+- 🚀 **Instant Setup** - Works out of the box with Cursor
+- 🎯 **Context-Aware** - Leverages Cursor's project understanding
+- 🔒 **Privacy-First** - No external API calls
+
+#### 🧠 **Advanced AI Features**
+
+- 🧠 **Intelligent Code Understanding** - AI analyzes business logic and intent
+- 🎯 **Smart Change Categorization** - Automatic detection of bug fixes, features, refactoring
+- 📋 **Enhanced Descriptions** - Context-aware explanations of what changed and why
+- ⚠️ **Unnecessary File Detection** - AI identifies files with minimal functional impact
+- 🔄 **Project Type Intelligence** - Advanced detection for React, Node.js, Python, Java, and more
+- 💡 **Fallback Safety** - Graceful degradation to traditional analysis when AI unavailable
 
 ## 🛠️ Installation
 
@@ -58,15 +78,64 @@ npm list -g generate-pr-mcp --parseable
 
 ## 🚦 Usage
 
-Run the MCP server in your project directory:
+### Traditional PR Generation
 
 ```bash
-# If installed globally
-mcp-server
-
-# Or with npx
-npx generate-pr-mcp
+# Basic PR generation using the generate_pr tool
+{
+  "name": "generate_pr",
+  "arguments": {
+    "title": "Add user authentication system",
+    "description": "Implement JWT-based authentication with login/logout functionality",
+    "rootUri": "file:///path/to/your/project"
+  }
+}
 ```
+
+### 🤖 AI-Powered PR Generation
+
+```bash
+# Enhanced AI analysis using the generate_ai_pr tool
+{
+  "name": "generate_ai_pr",
+  "arguments": {
+    "title": "Add user authentication system",
+    "description": "Implement JWT-based authentication with login/logout functionality",
+    "rootUri": "file:///path/to/your/project",
+    "llmProvider": "openai",
+    "apiKey": "your-api-key-here",
+    "model": "gpt-4"
+  }
+}
+```
+
+### 🎯 Cursor AI Integration (Recommended)
+
+```bash
+# Use Cursor's built-in AI - no API keys required!
+{
+  "name": "generate_cursor_pr",
+  "arguments": {
+    "title": "Add user authentication system",
+    "description": "Implement JWT-based authentication with login/logout functionality",
+    "rootUri": "file:///path/to/your/project"
+  }
+}
+```
+
+### Available Tools
+
+| Tool                  | Description               | AI Features                        | Configuration      |
+| --------------------- | ------------------------- | ---------------------------------- | ------------------ |
+| `generate_pr`         | Traditional analysis      | Basic diff processing              | None required      |
+| `generate_cursor_pr`  | **Cursor AI integration** | **Intelligent code understanding** | **None required!** |
+| `generate_ai_pr`      | External AI providers     | Advanced LLM analysis              | API keys required  |
+| `show_working_stages` | Display processing stages | Progress visualization             | None required      |
+
+> 📖 **Detailed Guides**:
+>
+> - 🎯 **Cursor AI Integration**: [examples/cursor-ai-example.md](examples/cursor-ai-example.md) - **Recommended** for zero-config AI analysis
+> - 🤖 **External LLM Setup**: [examples/ai-pr-example.md](examples/ai-pr-example.md) - For OpenAI, Anthropic, and custom APIs
 
 ### 📝 Example Output
 

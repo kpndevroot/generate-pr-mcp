@@ -1,7 +1,7 @@
 {
   "name": "generate-pr-mcp",
-  "version": "1.1.0",
-  "description": "A Model Context Protocol server for generating PRs",
+  "version": "1.1.1",
+  "description": "AI-powered Model Context Protocol server for intelligent PR generation with advanced code analysis",
   "type": "module",
   "bin": {
     "mcp-server": "./build/index.js"
@@ -28,7 +28,16 @@
     "mcp",
     "pr",
     "pull-request",
-    "generator"
+    "generator",
+    "ai",
+    "artificial-intelligence",
+    "code-analysis",
+    "llm",
+    "openai",
+    "anthropic",
+    "prompt-template",
+    "git-diff",
+    "automation"
   ],
   "author": "Your Name",
   "license": "MIT",

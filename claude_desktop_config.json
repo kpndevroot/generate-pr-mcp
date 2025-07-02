@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "generate-pr-mcp": {
+      "command": "node",
+      "args": [
+        "/path/to/your/npm/global/node_modules/generate-pr-mcp/build/index.js"
+      ]
+    }
+  }
+}

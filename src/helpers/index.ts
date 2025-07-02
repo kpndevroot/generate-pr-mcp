@@ -1,22 +1,49 @@
 import processDiffForPreview from "./processDiffForPreview.js";
-import interpretJavaScriptChanges from "./interpretJavaScriptChanges.js";
-import interpretJsonChanges from "./interpretJsonChanges.js";
-import interpretMarkdownChanges from "./interpretMarkdownChanges.js";
-import interpretGenericChanges from "./interpretGenericChanges.js";
-import countCodeBlocks from "./countCodeBlocks.js";
-import interpretFileChanges from "./interpretFileChanges.js";
-import getLanguageFromExtension from "./getLanguageFromExtension.js";
 import { generateKeyPoints, generateSimpleLogicSummary } from "./prUtils.js";
+import { validatePRParams, truncatePRContentForMCP } from "./validation.js";
+import {
+  validateGitRepository,
+  getCurrentBranch,
+  findMainBranch,
+} from "./gitOperations.js";
+import {
+  detectProjectType,
+  generateAIAnalysisPrompt,
+  parseAIAnalysisResponse,
+  cleanDiffForAI,
+  analyzeCodeChangesWithAI,
+  type ProjectMetadata,
+  type AIAnalysisResult,
+} from "./aiAnalysis.js";
 
+// Cursor AI integration
 export {
-  processDiffForPreview,
-  interpretJavaScriptChanges,
-  interpretJsonChanges,
-  interpretMarkdownChanges,
-  interpretGenericChanges,
-  countCodeBlocks,
-  interpretFileChanges,
-  getLanguageFromExtension,
+  analyzeWithCursorAI,
+  detectProjectTypeWithContext,
+  generateCursorOptimizedPrompt,
+  requestCursorAIAnalysis,
+  type MCPSamplingRequest,
+} from "./cursorAI.js";
+
+// Enhanced PR generation
+import { generatePRFromTemplate } from "./prGeneration.js";
+
+// Main exports
+export default processDiffForPreview;
+export {
+  validatePRParams,
+  truncatePRContentForMCP,
   generateKeyPoints,
   generateSimpleLogicSummary,
+  validateGitRepository,
+  getCurrentBranch,
+  findMainBranch,
+  detectProjectType,
+  generateAIAnalysisPrompt,
+  parseAIAnalysisResponse,
+  cleanDiffForAI,
+  analyzeCodeChangesWithAI,
+  generatePRFromTemplate,
+  type ProjectMetadata,
+  type AIAnalysisResult,
 };

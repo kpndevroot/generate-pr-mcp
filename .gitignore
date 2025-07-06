@@ -10,4 +10,4 @@ node_modules
 build
 package-lock.json
 filestructure.md
-improvement.md
+improvement.md.DS_Store

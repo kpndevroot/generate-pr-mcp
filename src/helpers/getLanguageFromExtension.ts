@@ -7,11 +7,6 @@ export default function getLanguageFromExtension(ext: string): string {
     tsx: "tsx",
     py: "python",
     rb: "ruby",
-    java: "java",
-    go: "go",
-    php: "php",
-    cs: "csharp",
-    rs: "rust",
     swift: "swift",
     kt: "kotlin",
     md: "markdown",
@@ -22,11 +17,9 @@ export default function getLanguageFromExtension(ext: string): string {
     html: "html",
     css: "css",
     scss: "scss",
-    less: "less",
     sql: "sql",
     sh: "bash",
     bash: "bash",
-    ps1: "powershell",
   };
 
   return languageMap[ext] || "text";

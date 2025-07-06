@@ -1,7 +1,7 @@
 {
   "name": "generate-pr-mcp",
-  "version": "1.1.0",
-  "description": "A Model Context Protocol server for generating PRs",
+  "version": "1.1.1",
+  "description": "Zero-configuration MCP server for Claude Desktop and Cursor IDE that generates intelligent PRs using built-in AI - no API keys required",
   "type": "module",
   "bin": {
     "mcp-server": "./build/index.js"
@@ -28,7 +28,16 @@
     "mcp",
     "pr",
     "pull-request",
-    "generator"
+    "generator",
+    "cursor",
+    "cursor-ide",
+    "claude-desktop",
+    "zero-config",
+    "no-api-keys",
+    "ai",
+    "code-analysis",
+    "git-diff",
+    "automation"
   ],
   "author": "Your Name",
   "license": "MIT",

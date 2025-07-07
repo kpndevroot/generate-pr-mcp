@@ -20,7 +20,6 @@ import {
 export {
   analyzeWithCursorAI,
   detectProjectTypeWithContext,
-  generateCursorOptimizedPrompt,
   requestCursorAIAnalysis,
   type MCPSamplingRequest,
 } from "./cursorAI.js";

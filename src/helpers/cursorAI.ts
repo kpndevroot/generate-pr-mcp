@@ -214,57 +214,6 @@ export function detectProjectTypeWithContext(
   }
 }
 
-/**
- * Generates a Cursor-optimized prompt that works well with Cursor's AI
- */
-export function generateCursorOptimizedPrompt(
-  gitDiff: string,
-  metadata: ProjectMetadata
-): string {
-  return `You are an expert software architect and code reviewer working in Cursor IDE. Analyze this git diff and provide a comprehensive PR summary.
-
-## 🎯 Analysis Goals:
-- Understand the intent behind these changes
-- Explain the business logic impact
-- Identify key functions/classes affected  
-- Flag any unnecessary or generated files
-- Categorize the change type accurately
-- Suggest an improved PR title and description
-
-## 📂 Project Context:
-- **Project Type**: ${metadata.projectType}
-- **Target Branch**: ${metadata.targetBranch}
-- **Base Branch**: ${metadata.baseBranch}
-
-## 📝 Code Changes:
-\`\`\`diff
-${gitDiff}
-\`\`\`
-
-## 📋 Required Output Format:
-Please provide your analysis in this exact structure:
-
-**PR Title:**
-[Your suggested title]
-
-**PR Description:**
-[Comprehensive description explaining the changes and their purpose]
-
-**Summary of Key Changes:**
-[Bullet-pointed list of main changes]
-
-**Business Logic Explanation:**
-[How these changes affect the application's functionality and user experience]
-
-**Potential Unnecessary Files or No-op Changes:**
-[List any files that seem to have minimal functional impact]
-
-**Change Type:**
-[One of: bugfix, feature, refactor, docs, performance, security, testing, style, chore]
-
----
-Focus on being concise but thorough. Explain not just what changed, but why it matters.`;
-}
 
 /**
  * Fallback analysis when Cursor AI is not available

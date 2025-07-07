@@ -10,7 +10,13 @@ import {
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { writeFile, appendFile } from "fs/promises";
-import { validatePRParams, truncatePRContentForMCP } from "./helpers/index.js";
+import {
+  validatePRParams,
+  truncatePRContentForMCP,
+  requestCursorAIAnalysis,
+  generatePRFromTemplate,
+  type AIAnalysisResult,
+} from "./helpers/index.js";
 
 // Promisify exec for better async handling
 const exec = promisify(execCallback);
@@ -255,12 +261,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         );
       }
 
-      // Import AI analysis functions
-      const { requestCursorAIAnalysis } = await import("./helpers/cursorAI.js");
-
+      // Perform AI analysis using Cursor's built-in capabilities
       // NOTE: In a real MCP implementation, we would use the sampling capability
       // For now, we'll use the traditional analysis with enhanced detection
-      const aiAnalysis = await requestCursorAIAnalysis(
+      const aiAnalysis: AIAnalysisResult = await requestCursorAIAnalysis(
         diff,
         projectDir,
         featureBranch,
@@ -272,9 +276,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       console.log("🎯 AI analysis complete");
 
       // Generate enhanced PR content using AI insights
-      const { generatePRFromTemplate } = await import(
-        "./helpers/prGeneration.js"
-      );
       const prdContent = await generatePRFromTemplate(
         title,
         description,

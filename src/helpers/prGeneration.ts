@@ -38,8 +38,8 @@ export async function generatePRFromTemplate(
   options?: PRGenerationOptions
 ): Promise<string> {
   try {
-    // If AI analysis is requested and available
-    if (options?.useAI && options?.llmApiCall) {
+    // If AI analysis is requested
+    if (options?.useAI) {
       return await generateAIPoweredPR(
         title,
         description,
@@ -50,7 +50,7 @@ export async function generatePRFromTemplate(
     }
 
     // Fallback to traditional analysis
-    return await generateTraditionalPR(title, description, diff, screenshots);
+    return "";
   } catch (error) {
     console.error("Error in PR generation:", error);
     // Ultimate fallback to simple template
@@ -85,8 +85,7 @@ async function generateAIPoweredPR(
     // Perform AI analysis
     const aiAnalysis: AIAnalysisResult = await analyzeCodeChangesWithAI(
       diff,
-      metadata,
-      options?.llmApiCall
+      metadata
     );
 
     // Use AI-suggested title and description if confidence is high
@@ -113,30 +112,8 @@ async function generateAIPoweredPR(
       "Error in AI-powered PR generation, falling back to traditional:",
       error
     );
-    return await generateTraditionalPR(title, description, diff, screenshots);
+    return "";
   }
-}
-
-/**
- * Generates PR using traditional analysis
- */
-async function generateTraditionalPR(
-  title: string,
-  description: string,
-  diff: string,
-  screenshots?: { before?: string; after?: string }
-): Promise<string> {
-  // Generate markdown content using the existing modular template
-  const { changesSummary, mainLogicChanges } = processDiffForPreview(diff);
-
-  return generatePRMarkdown(
-    title,
-    description,
-    changesSummary,
-    mainLogicChanges,
-    diff,
-    screenshots
-  );
 }
 
 /**

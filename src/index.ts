@@ -283,27 +283,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         undefined, // screenshots
         {
           useAI: true,
-          llmApiCall: async (prompt: string) => {
-            // This would normally use the client's AI sampling capability
-            // For now, return a structured response based on our analysis
-            return `**PR Title:**
-${aiAnalysis.prTitle}
-
-**PR Description:**
-${aiAnalysis.prDescription}
-
-**Summary of Key Changes:**
-${aiAnalysis.summaryOfKeyChanges}
-
-**Business Logic Explanation:**
-${aiAnalysis.businessLogicExplanation}
-
-**Potential Unnecessary Files or No-op Changes:**
-${aiAnalysis.potentialUnnecessaryFiles.join(", ") || "None detected"}
-
-**Change Type:**
-${aiAnalysis.changeType}`;
-          },
           projectDirectory: projectDir,
           targetBranch: featureBranch,
           baseBranch: mainBranch,

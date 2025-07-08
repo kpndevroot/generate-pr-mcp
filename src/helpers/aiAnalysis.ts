@@ -190,7 +190,7 @@ You are a **Senior Software Architect and Code Reviewer** with 10+ years of expe
 
 ## 📋 SPECIFIC OBJECTIVES
 Your analysis must accomplish these specific goals:
-1. **Intent Recognition**: Decode the developer's underlying purpose beyond surface-level changes
+1. **Intent Recognition**: Infer the developer's functional goal (e.g., implement feature, fix bug, simplify architecture), even if not explicitly stated
 2. **Business Logic Deep Dive**: Thoroughly analyze how changes affect business rules, data flow, user workflows, and core application logic
 3. **Architectural Impact Assessment**: Identify structural changes, design pattern modifications, component relationships, and system architecture implications
 4. **Business Impact Evaluation**: Assess effects on user experience, performance, scalability, and business functionality
@@ -208,19 +208,18 @@ Your analysis must accomplish these specific goals:
 ## 📚 REFERENCE STANDARDS
 Apply these analysis frameworks:
 - **SOLID Principles**: Evaluate adherence to software design principles
-- **Security First**: Identify potential security implications
 - **Performance Impact**: Assess computational and memory effects
 - **Maintainability**: Consider long-term code health and readability
 - **Testing Coverage**: Note areas that may need additional testing
 
 ## 🔍 ANALYSIS METHODOLOGY
-1. **Pattern Recognition**: Identify common change patterns (CRUD operations, API changes, refactoring, etc.)
+1. **Pattern Recognition**: Identify common change patterns (CRUD operations, API changes, refactoring, etc.).When identifying patterns, use exact line references or pseudo-code summaries where appropriate to strengthen insights.
 2. **Business Logic Analysis**: Deep dive into how changes affect business rules, validation logic, data processing, and user workflows
 3. **Architectural Impact Mapping**: Analyze structural changes, component relationships, design pattern modifications, and system boundaries
 4. **Dependency Mapping**: Trace how changes affect related components and services
 5. **Risk Assessment**: Evaluate potential breaking changes, compatibility issues, and architectural debt
 6. **Business Value Extraction**: Connect technical changes to business outcomes and user-facing features
-7. **Optimization Opportunities**: Suggest improvements or flag inefficiencies
+
 
 ## 📝 CODE DIFF TO ANALYZE:
 \`\`\`diff
@@ -254,7 +253,6 @@ Provide your analysis in this exact structure (use markdown formatting):
 - Business rules and validation logic modifications
 - User workflows and experience changes
 - Data processing, transformation, or storage logic
-- Business process automation or workflow changes
 - Integration with external systems or APIs
 - Compliance, security, or audit trail implications]
 
@@ -506,30 +504,17 @@ export function cleanDiffForAI(diff: string): string {
 
 /**
  * Main function to perform AI-powered analysis of code changes
- * This would integrate with your preferred LLM API (OpenAI, Anthropic, etc.)
  */
 export async function analyzeCodeChangesWithAI(
   diff: string,
-  metadata: ProjectMetadata,
-  llmApiCall?: (prompt: string) => Promise<string>
+  metadata: ProjectMetadata
 ): Promise<AIAnalysisResult> {
   try {
     // Clean the diff for AI processing
     const cleanedDiff = cleanDiffForAI(diff);
 
-    // Generate the analysis prompt
-    const prompt = generateAIAnalysisPrompt(cleanedDiff, metadata);
-
-    // If no LLM API provided, return a structured fallback analysis
-    if (!llmApiCall) {
-      return generateFallbackAnalysis(diff, metadata);
-    }
-
-    // Call the LLM API
-    const aiResponse = await llmApiCall(prompt);
-
-    // Parse and return the structured result
-    return parseAIAnalysisResponse(aiResponse);
+    // Return a structured fallback analysis
+    return generateFallbackAnalysis(diff, metadata);
   } catch (error) {
     console.error("Error in AI analysis:", error);
     return generateFallbackAnalysis(diff, metadata);
@@ -539,7 +524,7 @@ export async function analyzeCodeChangesWithAI(
 /**
  * Generates a fallback analysis when AI is not available
  */
-function generateFallbackAnalysis(
+export function generateFallbackAnalysis(
   diff: string,
   metadata: ProjectMetadata
 ): AIAnalysisResult {

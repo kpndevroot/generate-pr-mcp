@@ -10,6 +10,7 @@ import {
   cleanDiffForAI,
   type ProjectMetadata,
   type AIAnalysisResult,
+  analyzeCodeChangesWithAI,
 } from "./aiAnalysis.js";
 
 /**
@@ -40,7 +41,7 @@ export async function analyzeWithCursorAI(
     // If no sampling function provided, fall back to traditional analysis
     if (!samplingFunction) {
       console.log("📝 Cursor AI not available, using traditional analysis");
-      return generateFallbackAnalysis(diff, metadata);
+      return analyzeCodeChangesWithAI(diff, metadata);
     }
 
     // Clean the diff for AI processing
@@ -68,7 +69,7 @@ export async function analyzeWithCursorAI(
   } catch (error) {
     console.error("Error in Cursor AI analysis:", error);
     console.log("🔄 Falling back to traditional analysis");
-    return generateFallbackAnalysis(diff, metadata);
+    return analyzeCodeChangesWithAI(diff, metadata);
   }
 }
 
@@ -212,95 +213,6 @@ export function detectProjectTypeWithContext(
     console.warn("Error in project type detection:", error);
     return "Software Project";
   }
-}
-
-
-/**
- * Fallback analysis when Cursor AI is not available
- */
-function generateFallbackAnalysis(
-  diff: string,
-  metadata: ProjectMetadata
-): AIAnalysisResult {
-  const lines = diff.split("\n");
-  const addedLines = lines.filter((line) => line.startsWith("+")).length;
-  const removedLines = lines.filter((line) => line.startsWith("-")).length;
-  const modifiedFiles = [
-    ...new Set(
-      lines
-        .filter((line) => line.startsWith("diff --git"))
-        .map((line) => line.split(" ")[3]?.replace("b/", "") || "")
-        .filter((file) => file)
-    ),
-  ];
-
-  // Smart change type detection
-  let changeType = "refactor";
-  const diffLower = diff.toLowerCase();
-
-  if (
-    diffLower.includes("test") ||
-    diffLower.includes("spec") ||
-    diffLower.includes(".test.")
-  ) {
-    changeType = "testing";
-  } else if (
-    diffLower.includes("readme") ||
-    diffLower.includes(".md") ||
-    diffLower.includes("doc")
-  ) {
-    changeType = "docs";
-  } else if (
-    diffLower.includes("fix") ||
-    diffLower.includes("bug") ||
-    diffLower.includes("error")
-  ) {
-    changeType = "bugfix";
-  } else if (
-    diffLower.includes("security") ||
-    diffLower.includes("auth") ||
-    diffLower.includes("permission")
-  ) {
-    changeType = "security";
-  } else if (
-    diffLower.includes("performance") ||
-    diffLower.includes("optimize") ||
-    diffLower.includes("cache")
-  ) {
-    changeType = "performance";
-  } else if (addedLines > removedLines * 2) {
-    changeType = "feature";
-  } else if (
-    diffLower.includes("style") ||
-    diffLower.includes("css") ||
-    diffLower.includes("format")
-  ) {
-    changeType = "style";
-  }
-
-  // Detect unnecessary files
-  const unnecessaryFiles = modifiedFiles.filter(
-    (file) =>
-      file.includes("package-lock.json") ||
-      file.includes("yarn.lock") ||
-      file.includes(".log") ||
-      file.endsWith(".min.js") ||
-      file.includes("dist/") ||
-      file.includes("build/")
-  );
-
-  return {
-    prTitle: `${
-      changeType.charAt(0).toUpperCase() + changeType.slice(1)
-    }: Update ${metadata.projectType}`,
-    prDescription: `This PR includes changes to ${modifiedFiles.length} files with ${addedLines} additions and ${removedLines} deletions. The changes improve the ${metadata.projectType} functionality.`,
-    summaryOfKeyChanges: `• Modified ${modifiedFiles.length} files\n• Added ${addedLines} lines of code\n• Removed ${removedLines} lines of code\n• Updated core functionality`,
-    businessLogicExplanation: `These changes enhance the ${metadata.projectType} by improving code quality and functionality. The modifications affect core business logic and should improve user experience.`,
-    architecturalChanges: `Structural modifications detected in ${metadata.projectType} components. The changes maintain existing architecture while improving implementation details.`,
-    potentialUnnecessaryFiles: unnecessaryFiles,
-    changeType,
-    confidence: 0.7, // Good confidence for structured fallback
-  };
 }
 
 /**

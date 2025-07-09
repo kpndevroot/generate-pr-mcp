@@ -1,282 +1,271 @@
-# 🎯 Generate PR MCP
+# 🚀 MCP Server for AI-Powered Pull Request Generation
 
-<div align="center">
+A powerful Model Context Protocol (MCP) server that enhances your development workflow by generating comprehensive, professional pull request documentation using AI analysis.
 
-![PR Generation Meme](https://i.imgflip.com/8i7s5k.jpg)
+## ✨ Enhanced Features
 
-_When your PR description writes itself with zero configuration_
+### 🎯 **MCP Prompts Integration**
 
-[![npm version](https://img.shields.io/npm/v/generate-pr-mcp.svg)](https://www.npmjs.com/package/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+Leverage standardized prompt templates for comprehensive PR workflows:
 
-</div>
+#### **Available Prompts:**
 
-## 📋 Overview
+1. **`analyze_changes`** - Comprehensive Git Change Analysis
 
-A zero-configuration Model Context Protocol server that automatically generates detailed Pull Request descriptions using built-in AI. Works seamlessly with **Claude Desktop** and **Cursor IDE** - no API keys, no setup, no hassle!
+   - Analyzes git changes with detailed technical metrics
+   - Provides architectural impact assessment
+   - Includes security and compliance review
+   - Generates file-by-file analysis with recommendations
 
-## ✨ Features
+2. **`generate_comprehensive_pr`** - Enterprise-Grade PR Documentation
 
-### 🎯 Zero Configuration
+   - Creates detailed pull request documentation
+   - Optional security analysis and technical metrics
+   - Includes testing strategy and deployment considerations
+   - Provides review guidelines for stakeholders
 
-- ✅ **No API Keys Required** - Uses AI capabilities from your client
-- 🚀 **Instant Setup** - Works out of the box with Claude Desktop and Cursor IDE
-- 🎯 **Context-Aware** - Leverages your IDE's project understanding
-- 🔒 **Privacy-First** - No external API calls or data sharing
+3. **`code_review_checklist`** - Dynamic Code Review Checklists
+   - Generates project-specific review checklists
+   - Configurable focus areas (security, performance, maintainability, testing)
+   - Includes architecture and design considerations
+   - Provides deployment and operations guidelines
 
-### 🤖 Intelligent Analysis
+#### **Using MCP Prompts:**
 
-- 🧠 **Smart Code Understanding** - AI analyzes business logic and intent
-- 🎯 **Automatic Change Categorization** - Detects bug fixes, features, refactoring
-- 📋 **Enhanced Descriptions** - Context-aware explanations of what changed and why
-- ⚠️ **File Relevance Detection** - Identifies files with minimal functional impact
-- 🔄 **Project Type Intelligence** - Advanced detection for React, Node.js, Python, Java, and more
-- 💡 **Fallback Safety** - Graceful degradation when AI unavailable
+**In Claude Desktop or Cursor IDE:**
 
-### 📝 Professional Output
-
-- 🔍 Analyzes git diffs to create comprehensive PR descriptions
-- 📊 Highlights key implementation points and code changes
-- 🧩 Professional template structure
-- 🔎 Automatic project type detection
-- 📝 Generates markdown files for easy sharing
-
-## 🛠️ Installation
-
-```bash
-# Install globally
-npm install -g generate-pr-mcp
-
-# Or use with npx
-npx generate-pr-mcp
+```
+/analyze_changes project_path="/path/to/repo" target_branch="main"
 ```
 
-## ⚙️ Configuration
+**In MCP-compatible clients:**
 
-### 🤖 **Claude Desktop Setup** (Recommended)
+```javascript
+// List available prompts
+const prompts = await client.request("prompts/list");
 
-Claude Desktop provides the most powerful AI integration with no configuration required.
-
-#### **Step 1: Get Installation Path**
-
-```bash
-# Get the path to the generate-pr-mcp package
-npm list -g generate-pr-mcp --parseable
-
-# Output example: /Users/username/.nvm/versions/node/v22.14.0/lib/node_modules/generate-pr-mcp/build/index.js
+// Get specific prompt
+const analysisPrompt = await client.request("prompts/get", {
+  name: "analyze_changes",
+  arguments: {
+    project_path: "/path/to/repo",
+    target_branch: "main",
+    base_branch: "develop",
+  },
+});
 ```
 
-#### **Step 2: Configure Claude Desktop**
+### 🛠️ **Tool Integration**
 
-**For macOS:**
+Direct AI-powered PR generation tool:
 
-```bash
-# Open Claude Desktop configuration directory
-open ~/Library/Application\ Support/Claude/
+```javascript
+// Generate comprehensive PR
+const result = await client.request("tools/call", {
+  name: "generate_ai_pr",
+  arguments: {
+    title: "feat: implement user authentication system",
+    description: "Add OAuth 2.0 support with JWT tokens",
+    rootUri: "file:///path/to/project",
+  },
+});
 ```
 
-**For Windows:**
+## 🎯 Key Capabilities
 
-```bash
-# Navigate to Claude Desktop configuration directory
-# %APPDATA%\Claude\
+### 📊 **Enhanced Technical Analysis**
+
+- **Code Complexity Assessment**: Automatic complexity scoring and metrics
+- **Security Compliance Review**: Authentication, authorization, and data protection analysis
+- **Dependency Impact Analysis**: Cross-component dependency mapping and integration assessment
+- **Risk Assessment**: Breaking changes, deployment considerations, and testing recommendations
+
+### 🏗️ **Architectural Insights**
+
+- **Design Pattern Analysis**: Identification of pattern implementations and modifications
+- **Component Relationship Mapping**: System boundary analysis and scalability implications
+- **Technical Debt Assessment**: Maintainability metrics and technical debt implications
+- **Performance Impact Evaluation**: Computational complexity and scalability considerations
+
+### 🔒 **Security-First Approach**
+
+- **Authentication Flow Analysis**: Security model impact assessment
+- **Data Protection Review**: Privacy considerations and data handling analysis
+- **Vulnerability Assessment**: Input validation, sanitization, and attack vector analysis
+- **Compliance Mapping**: Audit trail requirements and regulatory considerations
+
+### 📁 **Granular File Analysis**
+
+- **Per-File Impact Assessment**: Individual file complexity and business impact scoring
+- **Change Classification**: Addition/Modification/Deletion categorization
+- **Business Logic Deep Dive**: Rule changes, validation logic, and workflow modifications
+- **Technical Recommendations**: Specific, actionable improvement suggestions
+
+## 🏗️ **Architecture**
+
+The enhanced MCP server provides a comprehensive PR generation ecosystem:
+
+```mermaid
+graph TB
+    A[MCP Client] -->|prompts/list| B[MCP Server]
+    A -->|prompts/get| B
+    A -->|tools/call| B
+    B -->|Enhanced Analysis| C[AI Analysis Engine]
+    C -->|Technical Metrics| D[Complexity Analyzer]
+    C -->|Security Review| E[Security Assessor]
+    C -->|Architecture Analysis| F[Design Pattern Detector]
+    B -->|Comprehensive Output| G[Enhanced PR Documentation]
+    G --> H[Technical Summary]
+    G --> I[Business Impact]
+    G --> J[Security Assessment]
+    G --> K[Risk Analysis]
 ```
 
-**For Linux:**
+## 📚 **Usage Examples**
+
+### **Comprehensive Project Analysis**
 
 ```bash
-# Navigate to Claude Desktop configuration directory
-~/.config/Claude/
+# Analyze current changes with full security and technical metrics
+/analyze_changes project_path="." target_branch="main"
+
+# Generate enterprise-grade PR with security analysis
+/generate_comprehensive_pr title="Security Enhancement" description="Implement 2FA" project_path="." include_security_analysis=true include_technical_metrics=true
+
+# Create focused code review checklist
+/code_review_checklist project_path="." focus_areas="security,performance"
 ```
 
-#### **Step 3: Create/Edit Configuration File**
+### **Enterprise Workflow Integration**
 
-Create or edit `claude_desktop_config.json`:
+**For Security-Critical Changes:**
+
+1. Use `analyze_changes` for comprehensive security assessment
+2. Generate `code_review_checklist` with security focus
+3. Create `generate_comprehensive_pr` with security analysis enabled
+
+**For Architecture Changes:**
+
+1. Run `analyze_changes` for architectural impact assessment
+2. Use `generate_comprehensive_pr` with technical metrics
+3. Generate focused review checklist for architecture and design
+
+## 🔧 **Setup & Configuration**
+
+### **Claude Desktop Integration**
+
+Add to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "generate-pr-mcp": {
-      "command": "node",
-      "args": [
-        "/path/to/your/npm/global/node_modules/generate-pr-mcp/build/index.js"
-      ]
+      "command": "npx",
+      "args": ["-y", "@your-org/generate-pr-mcp"],
+      "env": {}
     }
   }
 }
 ```
 
-**Replace `/path/to/your/npm/global/` with your actual npm global path from Step 1.**
+### **Cursor IDE Integration**
 
-#### **Step 4: Restart Claude Desktop**
+The MCP server automatically integrates with Cursor's built-in AI capabilities:
 
-- Quit Claude Desktop completely
-- Relaunch the application
-- You should now see the MCP server connected in Claude Desktop
+1. Install the package: `npm install -g @your-org/generate-pr-mcp`
+2. Configure in Cursor's MCP settings
+3. Access via slash commands: `/analyze_changes`, `/generate_comprehensive_pr`
 
-### 🎯 **Cursor IDE Setup**
+## 🎨 **Professional Output Examples**
 
-For Cursor IDE users who prefer the original Cursor AI integration:
+### **Enhanced PR Template Structure:**
 
-```json
-{
-  "mcpServers": {
-    "generate-pr-mcp": {
-      "command": "node",
-      "args": [
-        "/path/to/your/npm/global/node_modules/generate-pr-mcp/build/index.js"
-      ]
-    }
-  }
-}
+```markdown
+# 🎯 PR Title: feat: implement comprehensive user authentication system
+
+## 📋 Executive Summary
+
+Professional summary with business context and technical overview...
+
+## 🔑 Technical Implementation Details
+
+Detailed technical analysis with code examples and architectural decisions...
+
+## 💼 Business Logic Impact Analysis
+
+Comprehensive analysis of business rule changes and user workflow impact...
+
+## 🏗️ Architectural Changes & Design Impact
+
+System design modifications with component relationship analysis...
+
+## 🔍 Technical Complexity Analysis
+
+Complexity metrics, maintainability assessment, and performance implications...
+
+## 🔒 Security & Compliance Assessment
+
+Authentication/authorization analysis, data protection review, compliance mapping...
+
+## 📊 Dependency & Integration Impact
+
+External dependency changes, API contract modifications, migration requirements...
+
+## ⚠️ Risk Assessment & Recommendations
+
+Breaking changes analysis, deployment considerations, testing strategies...
+
+## 📁 Detailed File Analysis
+
+File-by-file impact assessment with technical recommendations...
+
+## 🧪 Testing & Quality Assurance
+
+Comprehensive testing strategy with coverage recommendations...
+
+## 🚀 Deployment & Operations
+
+Infrastructure requirements, monitoring needs, rollback procedures...
 ```
 
-## 🚦 Usage
+## 🌟 **Benefits**
 
-### 🤖 **With Claude Desktop**
+### **For Development Teams:**
 
-Once configured, simply ask Claude in the desktop app:
+- ⚡ **10x Faster PR Creation**: Automated comprehensive documentation
+- 🎯 **Consistent Quality**: Standardized analysis and documentation format
+- 🔍 **Thorough Review Guidance**: Detailed checklists and recommendations
+- 📊 **Data-Driven Insights**: Technical metrics and complexity analysis
 
-```
-Generate a PR for my current changes with the title "Add user authentication" and description "Implement JWT-based authentication with login/logout functionality"
-```
+### **For Enterprise Environments:**
 
-Claude will automatically use the MCP server to analyze your project and generate a comprehensive PR document.
+- 🔒 **Security-First Approach**: Comprehensive security and compliance assessment
+- 📋 **Audit Trail Compliance**: Detailed documentation for regulatory requirements
+- 🏗️ **Architectural Governance**: Design pattern analysis and technical debt assessment
+- 👥 **Stakeholder Communication**: Multi-audience documentation with business context
 
-### 🎯 **Direct MCP Tool Usage**
+### **For Code Quality:**
 
-For advanced users or programmatic access:
+- 🧪 **Testing Excellence**: Comprehensive testing strategy recommendations
+- ⚡ **Performance Optimization**: Performance impact analysis and recommendations
+- 🔧 **Maintainability Focus**: Technical debt assessment and maintainability metrics
+- 📚 **Knowledge Transfer**: Detailed technical documentation for team knowledge sharing
 
-```json
-{
-  "name": "generate_ai_pr",
-  "arguments": {
-    "title": "Add user authentication system",
-    "description": "Implement JWT-based authentication with login/logout functionality",
-    "rootUri": "file:///path/to/your/project"
-  }
-}
-```
+## 🤝 **Contributing**
 
-### 📋 Parameters
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-| Parameter     | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `title`       | string | ✅       | The title of the PR                |
-| `description` | string | ✅       | Brief description of the changes   |
-| `rootUri`     | string | ✅       | Root URI of your project directory |
+## 📄 **License**
 
-### 📝 Example Output
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The tool generates a comprehensive PR document including:
+## 🔗 **Related Resources**
 
-- 🎯 Professional PR title and description
-- 📊 Summary of key changes with business context
-- 🔧 Implementation details and technical approach
-- ✅ Testing checklist and coverage details
-- 📋 Change type categorization (feature/bugfix/refactor)
-- 🧪 Reviewer guidance and checkpoints
-
-## 🔄 How It Works
-
-1. **Git Analysis**: Detects current branch and finds base branch (main/master)
-2. **Diff Processing**: Analyzes differences between branches or staged changes
-3. **AI Enhancement**: Uses your client's AI to understand code context and business logic
-4. **Smart Generation**: Creates structured PR descriptions with intelligent insights
-5. **File Output**: Saves professional markdown document to your project
-
-## 🧪 Supported Project Types
-
-Auto-detects and optimizes PR descriptions for:
-
-- ⚛️ React applications
-- 🟢 Node.js backends
-- 🐍 Python web apps
-- ☕ Java applications
-- 🔷 TypeScript projects
-- 🦀 Rust applications
-- 🟦 Go services
-- And more!
-
-## 💡 Benefits & Comparison
-
-### ✅ Benefits
-
-- **🚀 Zero Setup Time**: Install and use immediately
-- **🔒 Privacy-First**: No data leaves your development environment
-- **💰 Cost-Free**: No API usage costs or subscription fees
-- **🎯 Context-Aware**: Understands your specific project structure
-- **🤖 Intelligent**: Real AI analysis without configuration hassle
-- **📱 Multi-Platform**: Works with Claude Desktop and Cursor IDE
-
-### ⚖️ Pros vs Cons
-
-#### ✅ Pros
-
-- Zero configuration required
-- No API keys or accounts needed
-- Privacy-focused (no external calls)
-- Cost-effective (completely free)
-- Instant setup and usage
-- Professional PR templates
-- Smart project type detection
-- Works with multiple AI platforms
-
-#### ⚠️ Cons
-
-- Requires compatible AI client (Claude Desktop or Cursor)
-- AI analysis depends on client AI availability
-- Currently focused on PR generation
-
-## 🎯 Perfect For
-
-- **Claude Desktop Users**: Seamless integration with Claude's AI
-- **Cursor Users**: Native integration with Cursor's AI capabilities
-- **Privacy-Conscious Teams**: No external API calls
-- **Quick Prototyping**: Zero setup for immediate productivity
-- **Cost-Sensitive Projects**: No additional AI service costs
-- **Enterprise Environments**: Privacy-compliant by design
-
-## 🔧 Troubleshooting
-
-### Common Issues:
-
-1. **MCP Server Not Found**
-
-   - Verify the path in your configuration file
-   - Ensure the package is installed globally
-   - Check that `build/index.js` exists
-
-2. **Permission Errors**
-
-   - Make sure the MCP server file is executable
-   - Check file permissions: `chmod +x build/index.js`
-
-3. **Git Repository Issues**
-
-   - Ensure you're in a valid git repository
-   - Make sure you have commits or staged changes
-   - Verify git is installed and accessible
-
-4. **Configuration Problems**
-   - Validate JSON syntax in configuration file
-   - Restart your AI client after configuration changes
-   - Check the client's MCP server logs
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io/docs/concepts/prompts)
+- [Claude Desktop Setup Guide](CLAUDE_DESKTOP_SETUP.md)
+- [Cursor IDE MCP Integration](https://docs.cursor.com/mcp)
+- [Enterprise Deployment Guide](docs/enterprise-deployment.md)
 
 ---
 
-**Made with ❤️ for the Claude Desktop and Cursor communities**
+**Made with ❤️ for developers who value comprehensive, professional PR documentation**

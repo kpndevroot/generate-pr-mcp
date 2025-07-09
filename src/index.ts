@@ -4,6 +4,8 @@ import { URI } from "vscode-uri";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
   ErrorCode,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
@@ -36,10 +38,13 @@ async function debugLog(message: string): Promise<void> {
 const server = new Server(
   {
     name: "mcp-server",
-    version: "1.0.0",
+    version: "1.2.0",
   },
   {
     capabilities: {
+      prompts: {
+        listChanged: true,
+      },
       tools: {
         generate_ai_pr: {
           description:
@@ -49,6 +54,369 @@ const server = new Server(
     },
   }
 );
+
+// MCP Prompts Implementation
+// Define available prompts for PR generation workflow
+const AVAILABLE_PROMPTS = [
+  {
+    name: "analyze_changes",
+    description:
+      "Analyze git changes and generate comprehensive technical analysis for PR documentation",
+    arguments: [
+      {
+        name: "project_path",
+        description: "Path to the git repository to analyze",
+        required: true,
+      },
+      {
+        name: "target_branch",
+        description: "Target branch for the PR (default: main)",
+        required: false,
+      },
+      {
+        name: "base_branch",
+        description: "Base branch to compare against (default: HEAD)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "generate_comprehensive_pr",
+    description:
+      "Generate a comprehensive PR document with detailed technical analysis, security assessment, and architectural impact",
+    arguments: [
+      {
+        name: "title",
+        description: "Title of the pull request",
+        required: true,
+      },
+      {
+        name: "description",
+        description: "Brief description of the changes",
+        required: true,
+      },
+      {
+        name: "project_path",
+        description: "Path to the git repository",
+        required: true,
+      },
+      {
+        name: "include_security_analysis",
+        description: "Include detailed security and compliance assessment",
+        required: false,
+      },
+      {
+        name: "include_technical_metrics",
+        description: "Include comprehensive technical complexity metrics",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "code_review_checklist",
+    description:
+      "Generate a comprehensive code review checklist based on project analysis",
+    arguments: [
+      {
+        name: "project_path",
+        description: "Path to the git repository to analyze",
+        required: true,
+      },
+      {
+        name: "focus_areas",
+        description:
+          "Comma-separated list of focus areas (security, performance, maintainability, testing)",
+        required: false,
+      },
+    ],
+  },
+];
+
+// Handle list prompts requests
+server.setRequestHandler(ListPromptsRequestSchema, async (request) => {
+  return {
+    prompts: AVAILABLE_PROMPTS,
+  };
+});
+
+// Handle get prompt requests
+server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  const safeArgs = args || {};
+
+  switch (name) {
+    case "analyze_changes":
+      return {
+        description: "Comprehensive git change analysis for PR documentation",
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: generateAnalyzeChangesPrompt(safeArgs),
+            },
+          },
+        ],
+      };
+
+    case "generate_comprehensive_pr":
+      return {
+        description:
+          "Generate comprehensive PR documentation with enhanced analysis",
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: generateComprehensivePRPrompt(safeArgs),
+            },
+          },
+        ],
+      };
+
+    case "code_review_checklist":
+      return {
+        description: "Generate comprehensive code review checklist",
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: generateCodeReviewChecklistPrompt(safeArgs),
+            },
+          },
+        ],
+      };
+
+    default:
+      throw new McpError(ErrorCode.InvalidParams, `Unknown prompt: ${name}`);
+  }
+});
+
+// Prompt generation functions
+function generateAnalyzeChangesPrompt(args: Record<string, unknown>): string {
+  const projectPath = args.project_path as string;
+  const targetBranch = (args.target_branch as string) || "main";
+  const baseBranch = (args.base_branch as string) || "HEAD";
+
+  return `# 🔍 Git Change Analysis for PR Documentation
+
+Please analyze the git changes in the repository at: \`${projectPath}\`
+
+**Analysis Parameters:**
+- Target Branch: \`${targetBranch}\`
+- Base Branch: \`${baseBranch}\`
+
+**Required Analysis:**
+
+## 📊 Technical Metrics
+- Calculate lines added/removed/modified
+- Count functions, classes, and interfaces changed
+- Assess code complexity score (High/Medium/Low)
+- Determine change intensity per file
+
+## 🏗️ Architectural Impact
+- Identify design pattern changes
+- Analyze component relationship modifications
+- Assess system boundary changes
+- Evaluate scalability implications
+
+## 🔒 Security & Compliance
+- Review authentication/authorization changes
+- Analyze data protection implications
+- Check for potential security vulnerabilities
+- Assess compliance impact (audit trails, logging)
+
+## 📁 File-by-File Analysis
+For each modified file, provide:
+- Change complexity (High/Medium/Low)
+- Business impact assessment
+- Technical change classification
+- Specific recommendations
+
+## ⚠️ Risk Assessment
+- Identify potential breaking changes
+- Assess deployment considerations
+- Recommend testing strategies
+- Flag areas requiring manual review
+
+Please provide a comprehensive analysis that can be used to generate professional PR documentation suitable for enterprise code review processes.`;
+}
+
+function generateComprehensivePRPrompt(args: Record<string, unknown>): string {
+  const title = args.title as string;
+  const description = args.description as string;
+  const projectPath = args.project_path as string;
+  const includeSecurityAnalysis = args.include_security_analysis === true;
+  const includeTechnicalMetrics = args.include_technical_metrics === true;
+
+  return `# 📝 Generate Comprehensive PR Documentation
+
+Create a detailed pull request document for the following changes:
+
+**PR Details:**
+- Title: "${title}"
+- Description: "${description}"
+- Project Path: \`${projectPath}\`
+
+**Documentation Requirements:**
+
+## 🎯 Core Sections
+1. **Executive Summary** - High-level overview of changes
+2. **Technical Implementation** - Detailed technical analysis
+3. **Business Logic Impact** - How changes affect business rules
+4. **Architectural Changes** - System design modifications
+
+${
+  includeSecurityAnalysis
+    ? `
+## 🔒 Security Analysis (Required)
+- Authentication/authorization implications
+- Data protection and privacy considerations
+- Input validation and sanitization review
+- Audit trail and compliance impact
+- Third-party dependency security assessment
+`
+    : ""
+}
+
+${
+  includeTechnicalMetrics
+    ? `
+## 📊 Technical Metrics (Required)
+- Code complexity analysis
+- Performance impact assessment
+- Maintainability metrics
+- Test coverage recommendations
+- Technical debt implications
+`
+    : ""
+}
+
+## 📁 Enhanced File Analysis
+- Detailed per-file impact assessment
+- Change classification (Addition/Modification/Deletion)
+- Business impact scoring (High/Medium/Low)
+- Specific technical recommendations
+
+## 🧪 Testing Strategy
+- Unit testing requirements
+- Integration testing needs
+- Performance testing recommendations
+- Security testing considerations
+
+## 🚀 Deployment Considerations
+- Environment-specific requirements
+- Migration considerations
+- Rollback strategies
+- Monitoring and observability needs
+
+## 👥 Review Guidelines
+- Critical review focus areas
+- Stakeholder-specific concerns
+- Approval criteria and checkpoints
+
+Generate a professional, enterprise-grade PR document that provides comprehensive technical documentation suitable for complex software development environments.`;
+}
+
+function generateCodeReviewChecklistPrompt(
+  args: Record<string, unknown>
+): string {
+  const projectPath = args.project_path as string;
+  const focusAreas = (
+    (args.focus_areas as string) ||
+    "security,performance,maintainability,testing"
+  ).split(",");
+
+  return `# ✅ Code Review Checklist Generator
+
+Generate a comprehensive code review checklist for the project at: \`${projectPath}\`
+
+**Focus Areas:** ${focusAreas.join(", ")}
+
+**Checklist Requirements:**
+
+## 🔍 Technical Review Items
+${
+  focusAreas.includes("security")
+    ? `
+### 🔒 Security Review
+- [ ] Authentication and authorization properly implemented
+- [ ] Input validation and sanitization in place
+- [ ] Sensitive data handling follows best practices
+- [ ] No hardcoded credentials or secrets
+- [ ] SQL injection and XSS prevention measures
+- [ ] Access control and permission models verified
+`
+    : ""
+}
+
+${
+  focusAreas.includes("performance")
+    ? `
+### ⚡ Performance Review
+- [ ] Database queries optimized
+- [ ] No N+1 query problems
+- [ ] Caching strategies implemented where appropriate
+- [ ] Memory usage considerations addressed
+- [ ] Computational complexity analyzed
+- [ ] I/O operations minimized
+`
+    : ""
+}
+
+${
+  focusAreas.includes("maintainability")
+    ? `
+### 🔧 Maintainability Review
+- [ ] Code follows established patterns and conventions
+- [ ] Functions and classes have single responsibilities
+- [ ] Code is properly documented
+- [ ] Error handling is comprehensive
+- [ ] Configuration is externalized
+- [ ] Dependencies are minimized and justified
+`
+    : ""
+}
+
+${
+  focusAreas.includes("testing")
+    ? `
+### 🧪 Testing Review
+- [ ] Unit tests cover new functionality
+- [ ] Integration tests verify system interactions
+- [ ] Edge cases and error conditions tested
+- [ ] Test coverage meets minimum requirements
+- [ ] Tests are maintainable and readable
+- [ ] Performance tests included for critical paths
+`
+    : ""
+}
+
+## 🏗️ Architecture & Design
+- [ ] Changes align with system architecture
+- [ ] Design patterns properly implemented
+- [ ] Component coupling minimized
+- [ ] Interfaces well-defined
+- [ ] Backward compatibility maintained
+- [ ] Technical debt implications considered
+
+## 📚 Documentation & Communication
+- [ ] Code comments explain complex logic
+- [ ] API documentation updated
+- [ ] Architecture decisions documented
+- [ ] Breaking changes clearly communicated
+- [ ] Migration guides provided if needed
+
+## 🚀 Deployment & Operations
+- [ ] Configuration changes documented
+- [ ] Database migrations reviewed
+- [ ] Infrastructure requirements identified
+- [ ] Monitoring and logging implemented
+- [ ] Rollback procedures defined
+
+Generate a project-specific, actionable checklist that reviewers can use to ensure comprehensive code quality assessment.`;
+}
 
 // Handle list tools requests
 server.setRequestHandler(ListToolsRequestSchema, async () => {

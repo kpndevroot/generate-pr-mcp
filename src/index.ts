@@ -24,7 +24,7 @@ import {
 const exec = promisify(execCallback);
 
 // Debug logging function
-async function debugLog(message: string): Promise<void> {
+export async function debugLog(message: string): Promise<void> {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}\n`;
   try {
@@ -457,12 +457,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       rootUri: string;
     };
 
-    console.log("🎯 Initializing AI-powered PR generation...");
+    await debugLog("🎯 Initializing AI-powered PR generation...");
 
     // Validate input parameters
     try {
       validatePRParams(request.params.arguments);
-      console.log("📋 Parameters validated successfully");
+      await debugLog("📋 Parameters validated successfully");
     } catch (error) {
       console.error(
         `Parameter validation failed: ${
@@ -472,10 +472,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       throw error;
     }
 
-    console.log("✅ AI PR generation initialization complete");
+    await debugLog("✅ AI PR generation initialization complete");
 
     try {
-      console.log("🎯 Analyzing project with AI assistance...");
+      await debugLog("🎯 Analyzing project with AI assistance...");
 
       // Get project directory
       if (!rootUri) {
@@ -489,7 +489,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       let projectDir: string;
       try {
         projectDir = URI.parse(rootUri).fsPath;
-        console.log(`🎯 AI analyzing project: ${projectDir}`);
+        await debugLog(`🎯 AI analyzing project: ${projectDir}`);
       } catch (error) {
         console.error(
           `Invalid root URI format: ${
@@ -504,7 +504,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       try {
         process.chdir(projectDir);
-        await debugLog("📂 Accessing project directory...");
+        await debugLog("📂 Accessing project directory first step...");
       } catch (error) {
         console.error(`Cannot access project directory: ${projectDir}`);
         throw new McpError(
@@ -517,9 +517,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         await exec("git rev-parse --is-inside-work-tree", {
           cwd: projectDir,
         });
-        console.log("🔧 Git repository validation complete");
+        await debugLog("🔧 Git repository validation complete");
       } catch (error) {
-        console.error(`Not a git repository: ${projectDir}`);
+        await debugLog(`Not a git repository: ${projectDir}`);
         throw new McpError(
           ErrorCode.InvalidParams,
           `Not a git repository: ${projectDir}. Please initialize git (git init) or navigate to a valid git repository.`
@@ -534,7 +534,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         });
         featureBranch = stdout.trim();
       } catch (error) {
-        console.error("Failed to determine current git branch");
+        await debugLog("Failed to determine current git branch");
         throw new McpError(
           ErrorCode.InternalError,
           "Failed to determine current git branch. Please ensure you have at least one commit in your repository."
@@ -547,18 +547,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         await exec(`git show-ref --verify refs/heads/main`, {
           cwd: projectDir,
         });
-        console.log("📌 Base branch: main");
+        await debugLog("📌 Base branch: main");
       } catch (error) {
         try {
           await exec(`git show-ref --verify refs/heads/master`, {
             cwd: projectDir,
           });
           mainBranch = "master";
-          console.log("📌 Base branch: master");
+          await debugLog("📌 Base branch: master");
         } catch (error) {
           mainBranch = featureBranch; // Fallback to current branch for staged changes
         }
       }
+      await debugLog(`🎯 Current branch: ${featureBranch}`);
+      await debugLog(`🎯 Main branch: ${mainBranch}`);
 
       // Get diff
       let diff: string;
@@ -578,14 +580,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           }
 
           if (!diff.trim()) {
-            console.error("No changes found for AI analysis");
+            await debugLog("No changes found for AI analysis");
             throw new McpError(
               ErrorCode.InvalidParams,
               "No changes found to generate PR for. Please make some changes to your files or stage them using 'git add' before generating a PR."
             );
           }
         } catch (error) {
-          console.error("Failed to get changes for AI analysis");
+          await debugLog("Failed to get changes for AI analysis");
           throw new McpError(
             ErrorCode.InternalError,
             "Failed to get changes. Please ensure git is working properly."
@@ -603,14 +605,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           diff = stdout;
 
           if (!diff.trim()) {
-            console.error("No differences found between branches");
+            await debugLog("No differences found between branches");
             throw new McpError(
               ErrorCode.InvalidParams,
               `No differences found between ${mainBranch} and ${featureBranch}. Please ensure you have committed changes on your feature branch.`
             );
           }
         } catch (error) {
-          console.error("Failed to generate diff for AI analysis");
+          await debugLog("Failed to generate diff for AI analysis");
           throw new McpError(
             ErrorCode.InternalError,
             `Failed to generate diff between ${mainBranch} and ${featureBranch}. Please ensure both branches exist and have commits.`
@@ -618,11 +620,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
       }
 
-      console.log("🎯 Diff prepared for AI analysis");
+      await debugLog("🎯 Diff prepared for AI analysis");
 
       // Check diff size
       if (diff.length > 5 * 1024 * 1024) {
-        console.error("Changes too large for AI analysis (>5MB)");
+        await debugLog("Changes too large for AI analysis (>5MB)");
         throw new McpError(
           ErrorCode.InvalidParams,
           "Changes are too large for AI analysis (>1MB). Please consider breaking your changes into smaller commits."
@@ -641,7 +643,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         "AI client context" // This would be actual context from the AI client
       );
 
-      console.log("🎯 AI analysis complete");
+      await debugLog("🎯 AI analysis complete");
 
       // Generate enhanced PR content using AI insights
       const prdContent = await generatePRFromTemplate(
@@ -657,8 +659,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
       );
 
-      console.log("📄 AI PR template generated");
-      console.log("📝 Writing AI-generated PR document...");
+      await debugLog("📄 AI PR template generated");
+      await debugLog("📝 Writing AI-generated PR document...");
 
       const prdFileName = `${title.replace(
         /[^a-zA-Z0-9]/g,
@@ -668,9 +670,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       try {
         await writeFile(prdFilePath, prdContent, "utf8");
-        console.log("💾 Cursor AI PR document saved");
+        await debugLog("💾 Cursor AI PR document saved");
       } catch (error) {
-        console.error("Failed to write Cursor AI PR document");
+        await debugLog("Failed to write Cursor AI PR document");
         throw new McpError(
           ErrorCode.InternalError,
           `Failed to write Cursor AI PR document: ${
@@ -679,7 +681,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         );
       }
 
-      console.log("✅ Cursor output delivery complete");
+      await debugLog("✅ Cursor output delivery complete");
 
       // Create response message
       const responseMessage = `=== 🎯 Cursor AI PR Generation Complete ===
@@ -695,14 +697,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         aiAnalysis.changeType.charAt(0).toUpperCase() +
         aiAnalysis.changeType.slice(1)
       } - Enhanced with Cursor context
-
-🎯 **Cursor AI Features Used**:
-- ✅ Intelligent project type detection
-- ✅ Context-aware business logic analysis
-- ✅ Automated change categorization (${aiAnalysis.changeType})
-- ✅ Smart file relevance filtering
-- ✅ Enhanced PR template generation
-- ✅ No API keys required!
 
 ${
   aiAnalysis.potentialUnnecessaryFiles.length > 0
@@ -726,7 +720,7 @@ The Cursor AI-enhanced PR document has been generated and is ready for review! �
         ],
       };
     } catch (error: any) {
-      console.error(
+      await debugLog(
         `Cursor AI PR generation failed: ${error.message || "Unknown error"}`
       );
       throw new McpError(

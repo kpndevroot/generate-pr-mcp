@@ -1,6 +1,7 @@
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { debugLog } from "../index.js";
 
 // Promisify exec for better async handling
 const exec = promisify(execCallback);
@@ -12,6 +13,7 @@ const exec = promisify(execCallback);
  */
 export async function validateGitRepository(projectDir: string): Promise<void> {
   try {
+    await debugLog("inside validateGitRepository");
     await exec("git rev-parse --is-inside-work-tree", {
       cwd: projectDir,
     });
@@ -31,6 +33,7 @@ export async function validateGitRepository(projectDir: string): Promise<void> {
  */
 export async function getCurrentBranch(projectDir: string): Promise<string> {
   try {
+    await debugLog("inside getCurrentBranch");
     const { stdout } = await exec(`git rev-parse --abbrev-ref HEAD`, {
       cwd: projectDir,
     });
@@ -56,6 +59,7 @@ export async function findMainBranch(
 ): Promise<string> {
   // Check for main branch first
   try {
+    await debugLog("inside findMainBranch");
     await exec(`git show-ref --verify refs/heads/main`, {
       cwd: projectDir,
     });

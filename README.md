@@ -86,6 +86,13 @@ The tool generates a structured PR document including:
 4. Generates a formatted PR description using templates
 5. Saves the output to a markdown file
 
+## 📝 Example input
+
+```
+generate a pull request using the quick-pr MCP server.
+
+```
+
 ## 🧪 Supported Project Types
 
 The tool automatically detects and optimizes PR descriptions for:

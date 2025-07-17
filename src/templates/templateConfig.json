@@ -1,0 +1,271 @@
+{
+  "templateVersion": "1.0.0",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "templateName": "Default Professional PR Template",
+  "description": "Comprehensive PR template with customizable sections for professional development teams",
+
+  "sections": {
+    "title": {
+      "enabled": true,
+      "required": true,
+      "description": "PR title section",
+      "placeholder": "Brief, descriptive title of the changes"
+    },
+
+    "summary": {
+      "enabled": true,
+      "required": true,
+      "description": "Main description of the PR",
+      "placeholder": "Detailed explanation of what this PR accomplishes and why",
+      "minLength": 50,
+      "maxLength": 1000
+    },
+
+    "relatedIssues": {
+      "enabled": true,
+      "required": false,
+      "description": "Links to related issues, tickets, or stories",
+      "autoDetect": true,
+      "patterns": ["#\\d+", "JIRA-\\d+", "closes #\\d+", "fixes #\\d+"]
+    },
+
+    "changesMade": {
+      "enabled": true,
+      "required": true,
+      "description": "List of specific changes made in this PR",
+      "autoGenerate": true,
+      "includeFileList": true,
+      "includeCommitMessages": true
+    },
+
+    "businessLogic": {
+      "enabled": true,
+      "required": false,
+      "description": "Business logic and functional changes",
+      "prompt": "Describe any business logic changes, new features, or functional modifications"
+    },
+
+    "ardChanges": {
+      "enabled": true,
+      "required": false,
+      "description": "Architecture Review Document changes",
+      "categories": ["database", "api", "dependencies", "infrastructure"],
+      "autoDetect": {
+        "database": ["migration", "schema", "model", "entity"],
+        "api": ["endpoint", "route", "controller", "service"],
+        "dependencies": ["package.json", "requirements.txt", "Gemfile"],
+        "infrastructure": ["docker", "kubernetes", "terraform", "config"]
+      }
+    },
+
+    "testingInstructions": {
+      "enabled": true,
+      "required": true,
+      "description": "Testing instructions for reviewers",
+      "includeManualSteps": true,
+      "includeAutomatedTests": true,
+      "requireTestEvidence": false
+    },
+
+    "impactAssessment": {
+      "enabled": true,
+      "required": false,
+      "description": "Assessment of performance, breaking changes, and security impact",
+      "categories": {
+        "performance": {
+          "enabled": true,
+          "autoAnalyze": false
+        },
+        "breakingChanges": {
+          "enabled": true,
+          "autoDetect": true,
+          "patterns": ["BREAKING", "breaking change", "deprecated"]
+        },
+        "security": {
+          "enabled": true,
+          "autoDetect": true,
+          "patterns": ["auth", "security", "vulnerability", "credential"]
+        }
+      }
+    },
+
+    "codeQuality": {
+      "enabled": true,
+      "required": false,
+      "description": "Code quality metrics and review focus areas",
+      "includeStaticAnalysis": true,
+      "includeLinting": true,
+      "includeTypeChecking": true,
+      "includeSecurityScan": true
+    },
+
+    "preMergeChecklist": {
+      "enabled": true,
+      "required": true,
+      "description": "Comprehensive pre-merge checklist",
+      "categories": {
+        "development": {
+          "enabled": true,
+          "items": [
+            "Code follows project style guidelines",
+            "Self-review completed",
+            "Comments added for complex logic",
+            "Documentation updated"
+          ]
+        },
+        "testing": {
+          "enabled": true,
+          "items": [
+            "New tests added for new functionality",
+            "All existing tests pass",
+            "Manual testing completed",
+            "Edge cases considered and tested"
+          ]
+        },
+        "deployment": {
+          "enabled": true,
+          "items": [
+            "Migration scripts created",
+            "Environment variables updated",
+            "Feature flags configured",
+            "Rollback plan documented"
+          ]
+        },
+        "communication": {
+          "enabled": false,
+          "items": [
+            "Stakeholders notified",
+            "Documentation updated",
+            "Changelog updated"
+          ]
+        }
+      }
+    },
+
+    "additionalNotes": {
+      "enabled": true,
+      "required": false,
+      "description": "Additional notes or context",
+      "placeholder": "Any additional context, concerns, or notes for reviewers"
+    },
+
+    "deploymentPlan": {
+      "enabled": false,
+      "required": false,
+      "description": "Deployment strategy and considerations",
+      "includeRollbackPlan": true,
+      "includeDowntime": true,
+      "includeEnvironments": ["development", "staging", "production"]
+    },
+
+    "reviewerGuidelines": {
+      "enabled": true,
+      "required": false,
+      "description": "Guidelines for reviewers",
+      "customizable": true
+    },
+
+    "mergeCriteria": {
+      "enabled": true,
+      "required": true,
+      "description": "Criteria that must be met before merging",
+      "items": [
+        "All CI/CD checks pass",
+        "At least one approval from code owner",
+        "All conversations resolved",
+        "Pre-merge checklist completed"
+      ]
+    }
+  },
+
+  "customization": {
+    "allowSectionReordering": true,
+    "allowCustomSections": true,
+    "allowEmojiToggle": true,
+    "allowStyleCustomization": true,
+    "companyBranding": {
+      "enabled": false,
+      "logoUrl": "",
+      "companyName": "",
+      "customFooter": ""
+    }
+  },
+
+  "validation": {
+    "requireMinimumDescription": true,
+    "minimumDescriptionLength": 50,
+    "requireTestingInstructions": true,
+    "requireChecklistCompletion": false,
+    "blockMergeOnIncomplete": false
+  },
+
+  "templates": {
+    "bugfix": {
+      "enabled": true,
+      "inheritFrom": "default",
+      "overrides": {
+        "businessLogic": { "enabled": false },
+        "ardChanges": { "enabled": false },
+        "deploymentPlan": { "enabled": false }
+      }
+    },
+    "feature": {
+      "enabled": true,
+      "inheritFrom": "default",
+      "overrides": {
+        "businessLogic": { "required": true },
+        "testingInstructions": { "requireTestEvidence": true }
+      }
+    },
+    "hotfix": {
+      "enabled": true,
+      "inheritFrom": "default",
+      "overrides": {
+        "impactAssessment": { "required": true },
+        "deploymentPlan": { "enabled": true, "required": true },
+        "preMergeChecklist": {
+          "categories": {
+            "communication": { "enabled": true }
+          }
+        }
+      }
+    },
+    "refactor": {
+      "enabled": true,
+      "inheritFrom": "default",
+      "overrides": {
+        "businessLogic": { "enabled": false },
+        "codeQuality": { "required": true },
+        "testingInstructions": { "includeAutomatedTests": true }
+      }
+    }
+  },
+
+  "integrations": {
+    "jira": {
+      "enabled": false,
+      "autoLinkIssues": true,
+      "requireJiraTicket": false,
+      "ticketPattern": "[A-Z]+-\\d+"
+    },
+    "github": {
+      "enabled": true,
+      "autoLinkIssues": true,
+      "useGithubTemplates": false
+    },
+    "slack": {
+      "enabled": false,
+      "notifyOnPRCreation": false,
+      "channel": "#development"
+    }
+  },
+
+  "preferences": {
+    "defaultTemplate": "default",
+    "autoSave": true,
+    "showPreview": true,
+    "useMarkdownEditor": true,
+    "enableSpellCheck": true,
+    "enableGrammarCheck": false
+  }
+}

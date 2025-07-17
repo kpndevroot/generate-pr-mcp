@@ -1,22 +1,23 @@
 {
-  "name": "generate-pr-mcp",
+  "name": "quick-pr",
   "version": "1.1.0",
   "description": "A Model Context Protocol server for generating PRs",
   "type": "module",
   "bin": {
-    "mcp-server": "./build/index.js"
+    "mcp-server": "./build/server.js"
   },
   "files": [
     "build"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "tsc && node -e \"require('fs').chmodSync('build/server.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+    "inspector": "npx @modelcontextprotocol/inspector build/server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
+    "simple-git": "^3.28.0",
     "vscode-uri": "^3.1.0",
     "zod": "^3.25.63"
   },

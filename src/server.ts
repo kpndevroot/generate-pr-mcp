@@ -184,39 +184,83 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       projectDirectory
     );
 
-    // Get available template types
-    // const availableTemplates = getAvailableTemplateTypes();
-
-    // Get the selected template content
-    // const selectedTemplate = templateType || "default";
-    // const templateContent = getTemplateContent(selectedTemplate);
-
     return {
       content: [
         {
           type: "text",
-          text: `\`\`\`
-**Branch Information:**
-- Feature Branch: ${currentBranch || "current"}
-- Base Branch: ${baseBranch || "main"}
-
-**Git Data (auto-fetched):**
-- Diff Content: 
-${rawDiff}
-
-- Commit Messages: 
-${rawCommits}
-
-- Files Changed: 
-${rawFiles}
-
-Please generate a comprehensive PR request based on this information.
-\`\`\``,
+          text: `You are a professional documentation assistant helping a product-based company engineer write a clear and structured Pull Request (PR) document.
+    
+    Use the following context to generate a well-formatted and professional PR description in markdown:
+    
+    ---
+    
+    ## 🔧 Pull Request Title
+    <Insert the PR title clearly summarizing the change>
+    
+    ---
+    
+    ## 📝 Description
+    <Briefly describe what has been changed. Include context or background if needed.>
+    
+    ---
+    
+    ## 🎯 Related Issue/Ticket
+    - JIRA/Ticket: <Ticket-ID or link>
+    - Feature/Module: <Optional>
+    
+    ---
+    
+    ## 💡 Motivation & Context
+    <Why was this change necessary? What problem does it solve? Mention business or user value.>
+    
+    ---
+    
+    ## 🧪 Test Plan
+    <How was this tested? Mention unit tests, manual test steps, or any automation used.>
+    
+    ---
+    
+    ## 🖼️ Screenshots (UI/UX)
+    <Attach or describe screenshots if applicable. If none, write \`N/A\`.>
+    
+    ---
+    
+    ## 📦 Impact
+    <What parts of the system are affected? Note any dependencies, risks, or rollbacks.>
+    
+    ---
+    
+    ## ✅ Checklist
+    - [ ] Code compiles correctly
+    - [ ] All tests passing
+    - [ ] PR follows code style and guidelines
+    - [ ] Linked to the correct issue/ticket
+    - [ ] Reviewed and approved by peers
+    
+    ---
+    
+    ### 🧠 Auto-Fetched Git Context
+    
+    \`\`\`markdown
+    **Branch Information:**
+    - Feature Branch: ${currentBranch || "current"}
+    - Base Branch: ${baseBranch || "main"}
+    
+    **Git Data (auto-fetched):**
+    - Diff Content: 
+    ${rawDiff}
+    
+    - Commit Messages: 
+    ${rawCommits}
+    
+    - Files Changed: 
+    ${rawFiles}
+    \`\`\`
+    `,
         },
       ],
     };
   }
-
   throw new Error(`Unknown tool: ${name}`);
 });
 
